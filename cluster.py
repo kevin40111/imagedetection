@@ -1,6 +1,4 @@
-'''
-原理可参考https://zhuanlan.zhihu.com/p/30033898
-'''
+
 import os
 import cv2
 import sys
@@ -14,11 +12,6 @@ from scipy.linalg import lstsq
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.optimize import least_squares
 
-##########################
-#两张图之间的特征提取及匹配
-##########################
-
-
 def extract_features(image_names):
 
     sift = cv2.xfeatures2d.SIFT_create(0, 3, 0.04, 10)
@@ -27,14 +20,12 @@ def extract_features(image_names):
     colors_for_all = []
     for image_name in image_names:
         image = cv2.imread(image_name)
+        print(image_names)
 
         if image is None:
             continue
-        key_points, descriptor = sift.detectAndCompute(
-            cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), None)
 
-        if len(key_points) <= 10:
-            continue
+        key_points, descriptor = sift.detectAndCompute(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), None)
 
         key_points_for_all.append(key_points)
         descriptor_for_all.append(descriptor)
@@ -211,10 +202,6 @@ def get_objpoints_and_imgpoints(matches, struct_indices, structure, key_points):
 
     return np.array(object_points), np.array(image_points)
 
-########################
-#bundle adjustment
-########################
-
 # 这部分中，函数get_3dpos是原方法中对某些点的调整，而get_3dpos2是根据笔者的需求进行的修正，即将原本需要修正的点全部删除。
 # bundle adjustment请参见https://www.cnblogs.com/zealousness/archive/2018/12/21/10156733.html
 
@@ -307,9 +294,8 @@ def main():
     imgdir = config.image_dir
     img_names = os.listdir(imgdir)
     img_names = sorted(img_names)
-
     for i in range(len(img_names)):
-        img_names[i] = imgdir + img_names[i]
+        img_names[i] = imgdir + '/' + img_names[i]
     # img_names = img_names[0:10]
 
     # K是摄像头的参数矩阵
