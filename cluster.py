@@ -14,7 +14,7 @@ from scipy.optimize import least_squares
 
 def extract_features(image_names):
 
-    sift = cv2.xfeatures2d.SIFT_create(0, 3, 0.04, 10)
+    sift = cv2.xfeatures2d.SIFT_create(0, 3, 0.04, 4)
     key_points_for_all = []
     descriptor_for_all = []
     colors_for_all = []
@@ -202,10 +202,6 @@ def get_objpoints_and_imgpoints(matches, struct_indices, structure, key_points):
 
     return np.array(object_points), np.array(image_points)
 
-# 这部分中，函数get_3dpos是原方法中对某些点的调整，而get_3dpos2是根据笔者的需求进行的修正，即将原本需要修正的点全部删除。
-# bundle adjustment请参见https://www.cnblogs.com/zealousness/archive/2018/12/21/10156733.html
-
-
 def get_3dpos(pos, ob, r, t, K):
     dtype = np.float32
 
@@ -249,12 +245,7 @@ def bundle_adjustment(rotations, motions, K, correspond_struct_idx, key_points_f
 
     return structure
 
-#######################
-#作图
-#######################
-
 # 这里有两种方式作图，其中一个是matplotlib做的，但是第二个是基于mayavi做的，效果上看，fig_v1效果更好。fig_v2是mayavi加颜色的效果。
-
 
 def fig(structure, colors):
     colors /= 255
@@ -310,7 +301,8 @@ def main():
     for i in range(1, len(matches_for_all)):
         object_points, image_points = get_objpoints_and_imgpoints(
             matches_for_all[i], correspond_struct_idx[i], structure, key_points_for_all[i + 1])
-        #在python的opencv中solvePnPRansac函数的第一个参数长度需要大于7，否则会报错
+    
+    #在python的opencv中solvePnPRansac函数的第一个参数长度需要大于7，否则会报错
 	#这里对小于7的点集做一个重复填充操作，即用点集中的第一个点补满7个
         if len(image_points) < 7:
             while len(image_points) < 7:
@@ -336,7 +328,7 @@ def main():
         rotations, motions, K, correspond_struct_idx, key_points_for_all, structure)
     i = 0
     # 由于经过bundle_adjustment的structure，会产生一些空的点（实际代表的意思是已被删除）
-# 这里删除那些为空的点
+    # 这里删除那些为空的点
     while i < len(structure):
         if math.isnan(structure[i][0]):
             structure = np.delete(structure, i, 0)

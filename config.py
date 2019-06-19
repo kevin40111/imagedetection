@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-image_dir = 'image'
+image_dir = 'image-temp'
 MRT = 0.7
 #相机内参矩阵,其中，K[0][0]和K[1][1]代表相机焦距，而K[0][2]和K[1][2]
 #代表图像的中心像素。
